@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { get } from 'lodash'
+import { get, has } from 'lodash'
 import styles from 'containers/user.module.sass';
 import avatar from 'static/avatar.png';
 import UsersHelper from 'api/users/users';
@@ -14,7 +14,6 @@ class UserContainer extends Component {
       newCountry: null,
       hasUserCountryUpdated: false
     }
-
   }
 
   componentDidMount = () => {
@@ -22,8 +21,15 @@ class UserContainer extends Component {
     if (userData.id) return this.setState({ user: userData, loading: false})
 
     UsersHelper.getUser(get(this.props, 'match.params.id'))
-      .then(res => this.setState({ user: res, loading: false }))
-      .catch(err => console.log(err));
+      .then(user => this.setState({ user, loading: false }))
+      .catch(err => {
+        console.log(err)
+        this.setState({ loading: false })
+      });
+  }
+
+  handleBackButtonPress = () => {
+    this.props.history.push('/');
   }
   
   renderBackButton() {
@@ -31,7 +37,7 @@ class UserContainer extends Component {
     return (
       <div
         className={styles.backButton}
-        onClick={() => this.props.history.push('/')}
+        onClick={this.handleBackButtonPress}
       >
         {buttonLabel}
       </div>
@@ -49,14 +55,18 @@ class UserContainer extends Component {
   renderProfileImage() {
     return (
       <div className={styles.profileImageWrapper}>
-        <img src={avatar} className={styles.profileImage} alt='avatar' />
+        <img 
+          src={avatar}
+          className={styles.profileImage}
+          alt='avatar'
+        />
       </div>
     )
   }
 
   renderUserName() {
     const { user } = this.state;
-    const userName = user && user.name || '';
+    const userName = get(user, 'name', '');
     return (
       <div className={styles.userName}>
         { userName }
@@ -64,9 +74,13 @@ class UserContainer extends Component {
     )
   }
 
+  getUserAge = () => {
+    const userAge = get(this.state, 'user.age', '')
+    return userAge ? userAge + ' years' : '';
+  }
+
   renderUserAge() {
-    const { user } = this.state;
-    const userAge = user && user.age ? user.age + ' years' : '';
+    const userAge = this.getUserAge()
     return (
       <div className={styles.userAge}>
         { userAge }
@@ -74,8 +88,18 @@ class UserContainer extends Component {
     )
   }
 
+  renderCountry = () => {
+    const { user, hasUserCountryUpdated } = this.state;
+    const hasUserCountry = has(user, 'city');
+    const showInput = !(hasUserCountry || hasUserCountryUpdated)
+
+    return (
+      showInput ? this.renderCountryField() : this.renderUserCountry()
+    )
+  }
+
   renderUserCountry() {
-    const { user, newCountry, hasUserCountryUpdated } = this.state;
+    const { user, newCountry } = this.state;
     const userCountry = get(user, 'city');
     
     return (
@@ -85,11 +109,15 @@ class UserContainer extends Component {
     )
   }
 
-  handleCountryChange() {
+  handleSubmitButton = () => {
     const { user, newCountry } = this.state;
     UsersHelper.changeUserCountry(newCountry, user.id)
       .then(res => this.setState({ hasUserCountryUpdated: true}))
       .catch(err => console.log(err));
+  }
+
+  handleCountryChange = (event) => {
+    this.setState({ newCountry: event.target.value })
   }
 
   renderCountryField() {
@@ -102,13 +130,13 @@ class UserContainer extends Component {
         <input
           className={styles.countryInput}
           type='text'
-          onChange={(event) => this.setState({ newCountry: event.target.value })}
+          onChange={this.handleCountryChange}
         />
         <input
           className={styles.countrySubmitButton}
           type='button'
           value={buttonLabel}
-          onClick={() => this.handleCountryChange()}
+          onClick={this.handleSubmitButton}
         />
       </div>
     )
@@ -123,17 +151,17 @@ class UserContainer extends Component {
   renderKnowledge() {
     const { user } = this.state;
     const knowledge = get(user, 'knowledge', []);
-    const knownLanguages = knowledge.map((language, key) => {
+    const knownLanguages = knowledge.map((languageName, key) => {
       return (
         <div
           key={key}
           className={styles.language}
         >
           <div className={styles.languageName}>
-            {language.language}
+            {languageName.language}
           </div>
           <div>
-            {language.frameworks.join(' - ')}
+            {languageName.frameworks.join(' - ')}
           </div>
         </div>
       )
@@ -153,9 +181,6 @@ class UserContainer extends Component {
   }
 
   render() {
-    const { user, hasUserCountryUpdated } = this.state;
-    const userCountry = get(user, 'city') || hasUserCountryUpdated;
-
     return (
       <div className={styles.wrapper}>
         {this.renderHeader()}
@@ -163,7 +188,7 @@ class UserContainer extends Component {
           {this.renderProfileImage()}
           {this.renderUserName()}
           {this.renderUserAge()}
-          { userCountry ? this.renderUserCountry() : this.renderCountryField() }
+          {this.renderCountry()}
           {this.renderSeparationLine()}
           {this.renderKnowledge()}
         </div>

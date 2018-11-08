@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styles from 'components/user-card.module.sass';
 import avatar from 'static/avatar.png';
+import { get } from 'lodash';
 
 
 class UserCard extends Component {
@@ -47,16 +48,16 @@ class UserCard extends Component {
     )
   }
 
-  handleUserCardClick() {
-    const { user } = this.props;
-    this.props.history.push('/user/' + user.id, user)
+  handleUserCardClick = () => {
+    const { user, history } = this.props;
+    history.push('/user/' + user.id, user)
   }
 
   render() {
     return (
       <div
         className={styles.wrapper}
-        onClick={() => this.handleUserCardClick()}
+        onClick={this.handleUserCardClick}
       >
         {this.renderProfileImage()}
         {this.renderUserName()}

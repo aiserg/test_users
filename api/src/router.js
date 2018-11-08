@@ -1,8 +1,6 @@
 import express from 'express';
 
-
 const users = require('../data/users')
-
 const fs = require('fs');
 const router = express.Router();
 
@@ -30,17 +28,14 @@ router.patch('/user/:id', (req, res, next) => {
   res.json(result);
 });
 
-router.post('/user/country', (req, res, next) => {
-  const userId = req.body.userId;
-  const country = req.body.country;
+router.post('/user/country', (req, res) => {
+  const { userId, country } = req.body;
 
   users.forEach(user => {
-    if (user.id == userId) {
-      user.city = country
-    }
+    if (user.id == userId) user.city = country;
   });
 
-  fs.writeFile(__dirname + '/../data/users.json', JSON.stringify(users), function (err) {
+  fs.writeFile(__dirname + '/../data/users.json', JSON.stringify(users), (err) => {
     if (err) return console.log(err);
     return res.sendStatus(200)
   });

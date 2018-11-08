@@ -9,25 +9,19 @@ class UsersContainer extends Component {
     super(props);
     this.state = {
       users: null,
+      loading: true,
     }
   }
 
   componentDidMount() {
     UsersHelper.getUsers()
-      .then(users => this.setState({ users }))
-      .catch(error => console.log(error));
+      .then(users => this.setState({ users, loading: false }))
+      .catch(error => {
+        console.log(error);
+        this.setState({ loading: false });
+      });
   }
-
-  render() {
-    return (
-      <div className={styles.app}>
-        <div className={styles.list}>
-          {this.renderCards()}
-        </div>
-      </div>
-    );
-  }
-
+  
   renderCards() {
     const { users } = this.state;
     const usersCards = users && users.map((user, key) =>
@@ -40,6 +34,15 @@ class UsersContainer extends Component {
     return usersCards
   }
 
+  render() {
+    return (
+      <div className={styles.users}>
+        <div className={styles.list}>
+          {this.renderCards()}
+        </div>
+      </div>
+    );
+  }
 }
 
 export default UsersContainer;
