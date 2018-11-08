@@ -30,11 +30,10 @@ router.patch('/user/:id', (req, res, next) => {
 
 router.post('/user/country', (req, res) => {
   const { userId, country } = req.body;
-
   users.forEach(user => {
     if (user.id == userId) user.city = country;
   });
-
+  //NOTE: It really is better to use simple JSON-orient DB for it.
   fs.writeFile(__dirname + '/../data/users.json', JSON.stringify(users), (err) => {
     if (err) return console.log(err);
     return res.sendStatus(200)
