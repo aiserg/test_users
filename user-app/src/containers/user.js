@@ -11,6 +11,7 @@ class UserContainer extends Component {
     this.state = {
       loading: true,
       user: null,
+      country: null,
     }
 
   }
@@ -72,12 +73,38 @@ class UserContainer extends Component {
     )
   }
 
-  renderUserCity() {
-    const { user } = this.state;
-    const userCountry = get(user, 'city');
+  renderUserCountry(userCountry) {
     return (
       <div className={styles.userCountry}>
         { userCountry }
+      </div>
+    )
+  }
+
+  handleCountryChange() {
+    const { user, country } = this.state;
+    UsersHelper.changeUserCountry(country, user.id)
+      .then(res => {})
+      .catch(err => console.log(err));
+  }
+
+  renderCountryField() {
+    const label = 'Country:';
+
+    return (
+      <div className={styles.countryField}>
+        <span className={styles.countryLabel}>{label}</span>
+        <input
+          className={styles.countryInput}
+          type='text'
+          onChange={(event) => this.setState({ country: event.target.value })}
+        />
+        <input
+          className={styles.countrySubmitButton}
+          type='button'
+          value='Submit'
+          onClick={() => this.handleCountryChange()}
+        />
       </div>
     )
   }
@@ -121,6 +148,9 @@ class UserContainer extends Component {
   }
 
   render() {
+    const { user } = this.state;
+    const userCountry = get(user, 'city');
+
     return (
       <div className={styles.wrapper}>
         {this.renderHeader()}
@@ -128,7 +158,7 @@ class UserContainer extends Component {
           {this.renderProfileImage()}
           {this.renderUserName()}
           {this.renderUserAge()}
-          {this.renderUserCity()}
+          { userCountry ? this.renderUserCountry(userCountry) : this.renderCountryField() }
           {this.renderSeparationLine()}
           {this.renderKnowledge()}
         </div>
