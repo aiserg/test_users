@@ -11,7 +11,8 @@ class UserContainer extends Component {
     this.state = {
       loading: true,
       user: null,
-      country: null,
+      newCountry: null,
+      hasUserCountryUpdated: false
     }
 
   }
@@ -73,23 +74,27 @@ class UserContainer extends Component {
     )
   }
 
-  renderUserCountry(userCountry) {
+  renderUserCountry() {
+    const { user, newCountry, hasUserCountryUpdated } = this.state;
+    const userCountry = get(user, 'city');
+    
     return (
       <div className={styles.userCountry}>
-        { userCountry }
+        { userCountry || newCountry }
       </div>
     )
   }
 
   handleCountryChange() {
-    const { user, country } = this.state;
-    UsersHelper.changeUserCountry(country, user.id)
-      .then(res => {})
+    const { user, newCountry } = this.state;
+    UsersHelper.changeUserCountry(newCountry, user.id)
+      .then(res => this.setState({ hasUserCountryUpdated: true}))
       .catch(err => console.log(err));
   }
 
   renderCountryField() {
     const label = 'Country:';
+    const buttonLabel = 'Submit';
 
     return (
       <div className={styles.countryField}>
@@ -97,12 +102,12 @@ class UserContainer extends Component {
         <input
           className={styles.countryInput}
           type='text'
-          onChange={(event) => this.setState({ country: event.target.value })}
+          onChange={(event) => this.setState({ newCountry: event.target.value })}
         />
         <input
           className={styles.countrySubmitButton}
           type='button'
-          value='Submit'
+          value={buttonLabel}
           onClick={() => this.handleCountryChange()}
         />
       </div>
@@ -148,8 +153,8 @@ class UserContainer extends Component {
   }
 
   render() {
-    const { user } = this.state;
-    const userCountry = get(user, 'city');
+    const { user, hasUserCountryUpdated } = this.state;
+    const userCountry = get(user, 'city') || hasUserCountryUpdated;
 
     return (
       <div className={styles.wrapper}>
@@ -158,7 +163,7 @@ class UserContainer extends Component {
           {this.renderProfileImage()}
           {this.renderUserName()}
           {this.renderUserAge()}
-          { userCountry ? this.renderUserCountry(userCountry) : this.renderCountryField() }
+          { userCountry ? this.renderUserCountry() : this.renderCountryField() }
           {this.renderSeparationLine()}
           {this.renderKnowledge()}
         </div>

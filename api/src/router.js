@@ -1,5 +1,7 @@
 import express from 'express';
-import users from '../data/users';
+
+
+const users = require('../data/users')
 
 const fs = require('fs');
 const router = express.Router();
