@@ -17,6 +17,12 @@ app.use((req, res, next) => {
   return next();
 });
 const port = 3000;
+
+// app.use(express.static(path.join(__dirname, '../../user-app/build')));
+// app.get('/', function (req, res) {
+//   res.sendFile(path.join(__dirname, '../../user-app/build', 'index.html'));
+// });
+
 app.use('/api', bodyParser.json({ type: 'application/json' }), require('./router').default);
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 app.use('/graphiql', graphiqlExpress({
