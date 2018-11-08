@@ -5,6 +5,7 @@ import schema from './schema';
 
 const app = express();
 const path = require('path');
+const Port = 3000;
 
 
 app.use((req, res, next) => {
@@ -16,16 +17,15 @@ app.use((req, res, next) => {
   }
   return next();
 });
-const port = 3000;
 
-// app.use(express.static(path.join(__dirname, '../../user-app/build')));
-// app.get('/', function (req, res) {
-//   res.sendFile(path.join(__dirname, '../../user-app/build', 'index.html'));
-// });
+app.use(express.static(path.join(__dirname, '../../user-app/build')));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../user-app/build', 'index.html'));
+});
 
 app.use('/api', bodyParser.json({ type: 'application/json' }), require('./router').default);
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 app.use('/graphiql', graphiqlExpress({
   endpointURL: '/graphql',
 }));
-app.listen(port, () => console.log(`Server on ${port}`));
+app.listen(Port, () => console.log(`Server on ${Port}`));
