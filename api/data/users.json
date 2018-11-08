@@ -249,35 +249,5 @@
                 "frameworks": []
             }
         ]
-    },
-    {
-        "id": 10,
-        "name": "John Smith",
-        "age": 29,
-	    "city": "United States of America",
-        "knowledge": [
-            {
-                "language": "Javascript",
-                "frameworks": [
-                    "express.js",
-                    "Vue",
-                    "AngularJS"
-                ]
-            },
-	    {
-                "language": "PHP",
-                "frameworks": []
-            },
-            {
-                "language": "Java",
-                "frameworks": [
-                    "Play"
-                ]
-            },
-            {
-                "language": "Turbo Pascal",
-                "frameworks": []
-            }
-        ]
     }
 ]
