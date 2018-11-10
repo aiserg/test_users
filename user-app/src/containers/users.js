@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styles from 'containers/users.module.sass';
 import UserCard from 'components/user-card';
 import UsersHelper from 'api/users/users';
+import Spinner from 'static/spinner.png';
 
 
 class UsersContainer extends Component {
@@ -35,7 +36,21 @@ class UsersContainer extends Component {
     return usersCards
   }
 
+  renderSpinner = () => {
+    return (
+      <div className={styles.spinnerWrapper}>
+        <img //eslint-disable-line
+          src={Spinner}
+          className={styles.spinner}
+        />
+      </div>
+    )
+  }
+
   render() {
+    const { loading } = this.state;
+    if (loading) return this.renderSpinner();
+
     return (
       <div className={styles.users}>
         <div className={styles.list}>

@@ -1,4 +1,8 @@
 @import 'src/color-schema';
+
+@keyframes spin
+  100%
+    transform: rotate(360deg)
   
 .users 
   text-align: center
@@ -13,3 +17,13 @@
   flex-wrap: wrap
   justify-content: center
   width: 720px
+
+.spinnerWrapper
+  display: flex
+  justify-content: center
+  margin-top: 33%
+
+.spinner
+  width: 30px
+  height: 30px
+  animation: spin 1s linear infinite
