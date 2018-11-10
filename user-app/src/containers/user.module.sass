@@ -1,3 +1,5 @@
+@import 'src/color-schema'
+  
 .wrapper
   display: flex
   flex-direction: column
@@ -5,9 +7,9 @@
   align-items: center
 
 .profileImageWrapper
-  border: 1px solid #E1E1E1
+  border: 1px solid $border-color
   border-radius: 50%
-  background-color: #E5E5E5
+  background-color: $users-background
   width: 100px
   height: 100px
 
@@ -42,7 +44,7 @@
 
 .userAge
   font-size: 14px
-  color: #888888
+  color: $user-age
   padding-top: 11px 
 
 .userCountry
@@ -51,25 +53,36 @@
 
 .countryField
   display: flex
+  flex-wrap: wrap
+  justify-content: center
   flex-direction: row
   align-items: center
-  padding-top: 20px
+  @media (max-width: 400px)
+    flex-direction: column
+  
 
 .countryLabel
   font-size: 14px
   margin-right: 10px
+  margin-top: 10px
+  @media (max-width: 400px)
+    margin-right: 0
 
 .countryInput
   width: 170px
   height: 27px
-  border: 1px solid #D5D5D5
+  border: 1px solid $country-input
+  padding-left: 10px
+  padding-right: 10px
+  margin-top: 10px
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25)
   outline: none
   font-size: 14px
 
 .countrySubmitButton
-  background-color: #47B2FF
-  color: white
+  background-color: $country-submit
+  color: $white
+  margin-top: 10px
   margin-left: 10px
   border-radius: 4px
   width: 85px
@@ -77,9 +90,15 @@
   font-size: 14px
   cursor: pointer
   outline: none
+  @media (max-width: 400px)
+    margin-left: 0
+
+.countrySubmitButtonDisabled
+  @extend .countrySubmitButton
+  background-color: $disabled-button
 
 .separationLine
-  border: 0.5px solid #D5D5D5
+  border: 0.5px solid $country-input
   width: 100vw
   max-width: 500px
   margin-top: 20px

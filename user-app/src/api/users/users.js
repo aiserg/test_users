@@ -29,14 +29,15 @@ const UsersHelper = {
 
   async changeUserCountry(country, userId) {
     try {
-      if (!country || !userId) throw Error('country or userId is not defined');
+      if (!country) throw Error('country is not defined');
+      if (!userId) throw Error('userId is not defined');
       await fetch('/api/user/country', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({userId: userId, country: country})
+        body: JSON.stringify({ userId, country })
       });
     } catch (error) {
       console.log('[Error][UsersHelper.changeUserCountry]', error);

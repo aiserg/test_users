@@ -5,6 +5,7 @@ import UsersHelper from 'api/users/users';
 
 
 class UsersContainer extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
@@ -13,7 +14,7 @@ class UsersContainer extends Component {
     }
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     UsersHelper.getUsers()
       .then(users => this.setState({ users, loading: false }))
       .catch(error => {
@@ -22,7 +23,7 @@ class UsersContainer extends Component {
       });
   }
   
-  renderCards() {
+  renderCards = () => {
     const { users } = this.state;
     const usersCards = users && users.map((user, key) =>
       <UserCard

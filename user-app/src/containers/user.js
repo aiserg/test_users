@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
-import { get, has } from 'lodash'
+import { get, has } from 'lodash';
 import styles from 'containers/user.module.sass';
 import avatar from 'static/avatar.png';
 import UsersHelper from 'api/users/users';
 
 
 class UserContainer extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
+      submitting: false,
       user: null,
       newCountry: null,
       hasUserCountryUpdated: false
@@ -17,19 +19,32 @@ class UserContainer extends Component {
   }
 
   componentDidMount = () => {
-    const userData = get(this.props, 'location.state')
-    if (userData.id) return this.setState({ user: userData, loading: false})
-
-    UsersHelper.getUser(get(this.props, 'match.params.id'))
+    const userData = get(this.props, 'location.state');
+    if (userData.id) return this.setState({ user: userData, loading: false});
+    const userId = get(this.props, 'match.params.id');
+    UsersHelper.getUser(userId)
       .then(user => this.setState({ user, loading: false }))
-      .catch(err => {
-        console.log(err)
-        this.setState({ loading: false })
+      .catch(error => {
+        console.log(error);
+        this.setState({ loading: false });
       });
   }
 
-  handleBackButtonPress = () => {
-    this.props.history.push('/');
+  render() {
+    return (
+      <div className={styles.wrapper}>
+        {this.renderHeader()}
+        <div className={styles.userInfo}>
+          {this.renderProfileImage()}
+          {this.renderUserName()}
+          {this.renderUserAge()}
+          {this.renderCountry()}
+          {this.renderSeparationLine()}
+          {this.renderKnowledge()}
+        </div>
+        {this.renderFooter()}
+      </div>
+    );
   }
   
   renderBackButton() {
@@ -39,34 +54,37 @@ class UserContainer extends Component {
         className={styles.backButton}
         onClick={this.handleBackButtonPress}
       >
-        {buttonLabel}
+        { buttonLabel }
       </div>
     )
   }
 
-  renderHeader() {
+  handleBackButtonPress = () => {
+    this.props.history.push('/');
+  }
+
+  renderHeader = () => {
     return (
       <header className={styles.header}>
-        {this.renderBackButton()}
+        { this.renderBackButton() }
       </header>
     )
   }
 
-  renderProfileImage() {
+  renderProfileImage = () => {
     return (
       <div className={styles.profileImageWrapper}>
         <img 
           src={avatar}
           className={styles.profileImage}
-          alt='avatar'
+          alt={'avatar'}
         />
       </div>
     )
   }
 
-  renderUserName() {
-    const { user } = this.state;
-    const userName = get(user, 'name', '');
+  renderUserName = () => {
+    const userName = get(this.state, 'user.name', '');
     return (
       <div className={styles.userName}>
         { userName }
@@ -79,8 +97,8 @@ class UserContainer extends Component {
     return userAge ? userAge + ' years' : '';
   }
 
-  renderUserAge() {
-    const userAge = this.getUserAge()
+  renderUserAge = () => {
+    const userAge = this.getUserAge();
     return (
       <div className={styles.userAge}>
         { userAge }
@@ -91,17 +109,13 @@ class UserContainer extends Component {
   renderCountry = () => {
     const { user, hasUserCountryUpdated } = this.state;
     const hasUserCountry = has(user, 'city');
-    const showInput = !(hasUserCountry || hasUserCountryUpdated)
-
-    return (
-      showInput ? this.renderCountryField() : this.renderUserCountry()
-    )
+    const showInput = !(hasUserCountry || hasUserCountryUpdated);
+    return showInput ? this.renderCountryField() : this.renderUserCountry()
   }
 
-  renderUserCountry() {
-    const { user, newCountry } = this.state;
-    const userCountry = get(user, 'city');
-    
+  renderUserCountry = () => {
+    const { newCountry } = this.state;
+    const userCountry = get(this.state, 'user.city');
     return (
       <div className={styles.userCountry}>
         { userCountry || newCountry }
@@ -111,30 +125,50 @@ class UserContainer extends Component {
 
   handleSubmitButton = () => {
     const { user, newCountry } = this.state;
+    this.setState({ submitting: true });
     UsersHelper.changeUserCountry(newCountry, user.id)
-      .then(res => this.setState({ hasUserCountryUpdated: true}))
-      .catch(err => console.log(err));
+      .then(res => this.setState({
+        hasUserCountryUpdated: true,
+        submitting: false,
+      }))
+      .catch(error => this.setState({
+        submitting: false,
+      }));
   }
 
   handleCountryChange = (event) => {
-    this.setState({ newCountry: event.target.value })
+    const newCountry = get(event, 'target.value', '');
+    this.setState({ newCountry })
   }
 
-  renderCountryField() {
+  canSaveCountry = () => {
+    const { submitting, newCountry } = this.state;
+    const properCountryName = newCountry && newCountry.length && newCountry.length > 0;
+    return properCountryName && !submitting
+  }
+ 
+  renderCountryField = () => {
     const label = 'Country:';
     const buttonLabel = 'Submit';
+    const isActiveSaveButton = this.canSaveCountry();
+    const buttonStyle = isActiveSaveButton ?
+      styles.countrySubmitButton :
+      styles.countrySubmitButtonDisabled;
 
     return (
       <div className={styles.countryField}>
-        <span className={styles.countryLabel}>{label}</span>
+        <span className={styles.countryLabel}>
+          {label}
+        </span>
         <input
-          className={styles.countryInput}
           type='text'
+          className={styles.countryInput}
           onChange={this.handleCountryChange}
         />
         <input
-          className={styles.countrySubmitButton}
           type='button'
+          disabled={!isActiveSaveButton}
+          className={buttonStyle}
           value={buttonLabel}
           onClick={this.handleSubmitButton}
         />
@@ -142,15 +176,14 @@ class UserContainer extends Component {
     )
   }
 
-  renderSeparationLine() {
+  renderSeparationLine = () => {
     return (
       <div className={styles.separationLine}/>
     )
   }
 
-  renderKnowledge() {
-    const { user } = this.state;
-    const knowledge = get(user, 'knowledge', []);
+  renderKnowledge = () => {
+    const knowledge = get(this.state, 'user.knowledge', []);
     const knownLanguages = knowledge.map((languageName, key) => {
       return (
         <div
@@ -174,28 +207,12 @@ class UserContainer extends Component {
     )
   }
 
-  renderFooter() {
+  renderFooter = () => {
     return (
       <footer className={styles.footer}/>
     )
   }
 
-  render() {
-    return (
-      <div className={styles.wrapper}>
-        {this.renderHeader()}
-        <div className={styles.userInfo}>
-          {this.renderProfileImage()}
-          {this.renderUserName()}
-          {this.renderUserAge()}
-          {this.renderCountry()}
-          {this.renderSeparationLine()}
-          {this.renderKnowledge()}
-        </div>
-        {this.renderFooter()}
-      </div>
-    );
-  }
 }
 
 export default UserContainer;

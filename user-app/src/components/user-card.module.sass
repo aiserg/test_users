@@ -1,8 +1,10 @@
+@import 'src/color-schema'
+  
 .wrapper
   display: flex
   width: 220px
   height: 292px
-  background-color: white
+  background-color: $white
   margin: 10px
   border-radius: 6px
   flex-direction: column
@@ -14,9 +16,9 @@
     transform: scale(1.05)
 
 .profileImageWrapper
-  border: 1px solid #E1E1E1
+  border: 1px solid $border-color
   border-radius: 50%
-  background-color: #E5E5E5
+  background-color: $users-background
   width: 100px
   height: 100px
   margin-top: 40px
@@ -33,7 +35,7 @@
 
 .userAge
   font-size: 14px
-  color: #888888
+  color: $user-age
   padding-top: 10px 
 
 .knownLanguages

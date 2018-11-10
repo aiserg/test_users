@@ -4,54 +4,7 @@ import avatar from 'static/avatar.png';
 import { get } from 'lodash';
 
 
-class UserCard extends Component {
-
-  renderProfileImage() {
-    return (
-      <div className={styles.profileImageWrapper}>
-        <img src={avatar} className={styles.profileImage} alt='avatar' />
-      </div>
-    )
-  }
-
-  renderUserName() {
-    const { user } = this.props;
-    const userName = user.name || '';
-    return (
-      <div className={styles.userName}>
-        { userName }
-      </div>
-    )
-  }
-
-  renderUserAge() {
-    const { user } = this.props;
-    const userAge = user.age ? user.age + ' years' : '';
-    return (
-      <div className={styles.userAge}>
-        { userAge }
-      </div>
-    )
-  }
-
-  renderKnownLanguages() {
-    const { user } = this.props;
-    const knowledge = user.knowledge || [];
-    const knownLanguages = knowledge.map(languageName => {
-      return languageName.language
-    })
-
-    return (
-      <div className={styles.knownLanguages}>
-        { knownLanguages.join(', ') }
-      </div>
-    )
-  }
-
-  handleUserCardClick = () => {
-    const { user, history } = this.props;
-    history.push('/user/' + user.id, user)
-  }
+export default class UserCard extends Component {
 
   render() {
     return (
@@ -67,6 +20,56 @@ class UserCard extends Component {
     );
   }
 
-}
+  renderProfileImage = () => {
+    return (
+      <div className={styles.profileImageWrapper}>
+        <img
+          src={avatar}
+          className={styles.profileImage}
+          alt='avatar'
+        />
+      </div>
+    )
+  }
 
-export default UserCard;
+  renderUserName = () => {
+    const userName = get(this.props, 'user.name', '');
+    return (
+      <div className={styles.userName}>
+        { userName }
+      </div>
+    )
+  }
+
+  getUserAge = () => {
+    const userAge = get(this.props, 'user.age', '')
+    return userAge ? userAge + ' years' : '';
+  }
+
+  renderUserAge = () => {
+    const userAge = this.getUserAge();
+    return (
+      <div className={styles.userAge}>
+        { userAge }
+      </div>
+    )
+  }
+
+  renderKnownLanguages = () => {
+    const knowledge = get(this.props, 'user.knowledge', []);
+    const knownLanguages = knowledge.map(languageName => languageName.language);
+    const languageList = knownLanguages.join(', ');
+
+    return (
+      <div className={styles.knownLanguages}>
+        { languageList }
+      </div>
+    )
+  }
+
+  handleUserCardClick = () => {
+    const { user, history } = this.props;
+    history.push('/user/' + user.id, user);
+  }
+
+}
