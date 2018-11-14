@@ -1,32 +1,33 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import styles from 'containers/users.module.sass';
 import UserCard from 'components/user-card';
-import UsersHelper from 'api/users/users';
 import Spinner from 'static/spinner.png';
+import { getUsers } from 'store/actions/users';
 
 
 class UsersContainer extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      users: null,
-      loading: true,
-    }
+  componentDidMount() {
+    this.props.dispatch(getUsers());
   }
 
-  componentDidMount = () => {
-    UsersHelper.getUsers()
-      .then(users => this.setState({ users, loading: false }))
-      .catch(error => {
-        console.log(error);
-        this.setState({ loading: false });
-      });
+  render() {
+    const { isPageLoaded } = this.props.users;
+    if (!isPageLoaded) return this.renderSpinner();
+
+    return (
+      <div className={styles.users}>
+        <div className={styles.list}>
+          {this.renderCards()}
+        </div>
+      </div>
+    );
   }
   
   renderCards = () => {
-    const { users } = this.state;
-    const usersCards = users && users.map((user, key) =>
+    const { usersProfiles } = this.props.users;
+    const usersCards = usersProfiles && usersProfiles.map((user, key) =>
       <UserCard
         key={key}
         user={user}
@@ -46,19 +47,12 @@ class UsersContainer extends Component {
       </div>
     )
   }
-
-  render() {
-    const { loading } = this.state;
-    if (loading) return this.renderSpinner();
-
-    return (
-      <div className={styles.users}>
-        <div className={styles.list}>
-          {this.renderCards()}
-        </div>
-      </div>
-    );
-  }
 }
 
-export default UsersContainer;
+const mapStateToProps = state => {
+  return ({
+    users: state.users,
+  })
+}
+
+export default connect(mapStateToProps)(UsersContainer);

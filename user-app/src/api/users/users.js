@@ -17,7 +17,7 @@ const UsersHelper = {
 
   async getUser(userId) {
     try {
-      if (!userId) throw Error('userId is not defined');
+      if (!userId) throw Error('[getUser] userId is not defined');
       const response = await fetch(`${'/api/user/' + userId}`);
       const body = await response.json();
       if (response.status !== OK_STATUS) throw Error(body.message);
